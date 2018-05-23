@@ -23,7 +23,8 @@ RUN apt-get update && \
 
 COPY entrypoint.sh /
 
-VOLUME /etc
+VOLUME /etc/samba
+VOLUME /etc/smbldap-tools
 VOLUME /var/lib/samba/private
 VOLUME /share
 
@@ -32,4 +33,4 @@ EXPOSE 445
 
 ENTRYPOINT ["bash", "/entrypoint.sh"]
 
-CMD ["/usr/sbin/smbd", "-F", "-S", "-D"]
+CMD /usr/sbin/smbd -FSD < /dev/null

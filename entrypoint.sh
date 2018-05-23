@@ -46,7 +46,6 @@ cat > /etc/samba/smb.conf << EOF
 EOF
 fi
 
-if [ ! -f /etc/nslcd.conf ]; then
 cat > /etc/nslcd.conf << EOF
 uid nslcd
 gid nslcd
@@ -55,7 +54,6 @@ base $LDAP_BASE_DN
 binddn $LDAP_ADMIN_DN
 bindpw $LDAP_ADMIN_PASSWD
 EOF
-fi
 
 if [ ! -f /etc/smbldap-tools/smbldap.conf ]; then
 cat > /etc/smbldap-tools/smbldap.conf << EOF
