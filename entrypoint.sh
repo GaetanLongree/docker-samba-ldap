@@ -1,16 +1,5 @@
 #!/bin/bash 
 
-if [ $LDAP_CAPABLE = 1 ]; then
-	pushd /
-	wget https://gist.githubusercontent.com/Spredzy/6389499/raw/e503ecc6bb530316b8d1db9c1f33d89a677e66d3/Crypt-SmbHash --no-check-certificate -O script
-	pushd /tmp
-        wget http://search.cpan.org/CPAN/authors/id/B/BJ/BJKUIT/Crypt-SmbHash-0.12.tar.gz
-        tar xzf Crypt-SmbHash-0.12.tar.gz
-	pushd /tmp/Crypt-SmbHash-0.12
-        perl Makefile.PL
-        make && make test && make install
-fi
-
 if [ ! -d /etc/samba ]; then
 	mkdir /etc/samba
 fi
@@ -20,6 +9,15 @@ if [ ! -d /etc/smbldap-tools ]; then
 fi
 
 if [ $LDAP_CAPABLE = 1 ]; then
+	pushd /
+	wget https://gist.githubusercontent.com/Spredzy/6389499/raw/e503ecc6bb530316b8d1db9c1f33d89a677e66d3/Crypt-SmbHash --no-check-certificate -O script
+	pushd /tmp
+        wget http://search.cpan.org/CPAN/authors/id/B/BJ/BJKUIT/Crypt-SmbHash-0.12.tar.gz
+        tar xzf Crypt-SmbHash-0.12.tar.gz
+	pushd /tmp/Crypt-SmbHash-0.12
+        perl Makefile.PL
+        make && make test && make install
+
 if [ ! -f /etc/samba/smb.conf ]; then
 cat > /etc/samba/smb.conf << EOF
 [global]
@@ -106,11 +104,50 @@ EOF
 fi
 
 smbpasswd -w $LDAP_ADMIN_PASSWD
-fi
 
-# If LDAP is not enabled, copy original files from tmp to their original location
-if [ -z "$(ls -A /etc/samba)" ]; then
-	cp -R /tmp/samba/* /etc/samba
+else
+
+    # If LDAP is not enabled, copy original files from tmp to their original location
+    if [ -z "$(ls -A /etc/samba)" ]; then
+        cp -R /tmp/samba/* /etc/samba
+    fi
+
+    # create a user for the samba share
+    groupadd smbgrp
+    useradd $SMB_USER -G smbgrp
+    echo $SMB_USER_PASSWD | passwd --stdin $SMB_USER
+
+    # reproduce the user and password for samba
+    echo -ne "$SMB_USER_PASSWD\n$SMB_USER_PASSWD\n" | smbpasswd -a -s $SMB_USER
+
+    mkdir /share/data
+    chown -R $SMB_USER:smbgrp /share/data
+    chmod -R ug+rwx,o+rx-w /share/data
+
+    mkdir /share/external
+    chown -R $SMB_USER:smbgrp /share/external
+    chmod -R ug+rwx,o+rx-w /share/external
+
+cat >> /etc/samba/smb.conf << EOF
+[data]
+comment = Data
+path = /share/data
+valid users = @smbgrp
+force group = smbgrp
+create mask = 0660
+directory mask = 0771
+writable = yes
+
+[external]
+path = /share/external
+force group = smbgrp
+create mask = 0660
+directory mask = 0771
+browsable =yes
+writable = yes
+guest ok = yes
+EOF
+
 fi
 
 exec "$@"
