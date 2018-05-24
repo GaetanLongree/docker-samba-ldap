@@ -61,7 +61,7 @@ cajetan19/samba
 
 ### LDAP authentication functionality
 
-**NOTE** I was fully unable to get this container working by authenticating LDAP users for the shared folder. This was built together in a relatively short period of time, with a fall back to a classic samba share as a backup solution.
+**NOTE** I am fully unable to get this container working by authenticating LDAP users for the shared folder. This was built together in a relatively short period of time, with a fall back to a classic samba share as a backup solution.
 
 Any information/tips/pointer/hints as to why this did not work and/or how to fix this would be very appreciated. I shall update this image accordingly with the provided information to render this image functional.
 
