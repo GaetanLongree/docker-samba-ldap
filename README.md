@@ -10,14 +10,20 @@ I will redact a more indepth README once I'm over with finals, thanks for unders
 ## Sample docker run commands
 
 ### Simple samba container
+The basic SAMBA configuration creates 2 default shares:
+
+**\\samba-srv\data** accessible only from the SMB_USER account with the SMB_USER_PASSWD password.
+
+**\\samba-srv\external** accessible by anyone with read/write permissions.
+
 ```
 docker run -d \
 -p 139:139 \
 -p 445:445 \
 -v /mnt/share/samba/etc/samba:/etc/samba \
--v /mnt/share/samba/etc/smbldap-tools:/etc/smbldap-tools \
--v /mnt/share/samba/private:/var/lib/samba/private \
 -v /mnt/share/samba/share:/share \
+--env SMB_USER=user \
+--env SMB_USER_PASSWD=password \
 --name samba \
 cajetan19/samba-ldap
 ```
@@ -50,3 +56,15 @@ docker run \
 --name samba \
 cajetan19/samba
 ```
+
+## Disclaimers
+
+### LDAP authentication functionality
+
+**NOTE** I was fully unable to get this container working by authenticating LDAP users for the shared folder. This was built together in a relatively short period of time, with a fall back to a classic samba share as a backup solution.
+
+Any information/tips/pointer/hints as to why this did not work and/or how to fix this would be very appreciated. I shall update this image accordingly with the provided information to render this image functional.
+
+### Performance issues
+
+Be aware that the classic Samba shares are not the most performant, while I tried investigating the reasons, time constraints forced me to leave this as is. As for the LDAP authentication, any information/tips/clues are most welcome.
