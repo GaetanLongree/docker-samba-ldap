@@ -109,26 +109,8 @@ else
 
     # If LDAP is not enabled, copy original files from tmp to their original location
     if [ -z "$(ls -A /etc/samba)" ]; then
-        cp -R /tmp/samba/* /etc/samba
-    fi
 
-    # create a user for the samba share
-    groupadd smbgrp
-    useradd $SMB_USER -G smbgrp
-    echo "$SMB_USER:$SMB_USER_PASSWD" | chpasswd
-
-    # reproduce the user and password for samba
-    echo -ne "$SMB_USER_PASSWD\n$SMB_USER_PASSWD\n" | smbpasswd -a -s $SMB_USER
-
-    mkdir /share/data
-    chown -R $SMB_USER:smbgrp /share/data
-    chmod -R ug+rwx,o+rx-w /share/data
-
-    mkdir /share/external
-    chown -R $SMB_USER:smbgrp /share/external
-    chmod -R ug+rwx,o+rx-w /share/external
-
-cat >> /etc/samba/smb.conf << EOF
+cat >> /tmp/samba/smb.conf << EOF
 [data]
 comment = Data
 path = /share/data
@@ -147,6 +129,24 @@ browsable =yes
 writable = yes
 guest ok = yes
 EOF
+cp -R /tmp/samba/* /etc/samba
+    fi
+
+    # create a user for the samba share
+    groupadd smbgrp
+    useradd $SMB_USER -G smbgrp
+    echo "$SMB_USER:$SMB_USER_PASSWD" | chpasswd
+
+    # reproduce the user and password for samba
+    echo -ne "$SMB_USER_PASSWD\n$SMB_USER_PASSWD\n" | smbpasswd -a -s $SMB_USER
+
+    mkdir /share/data
+    chown -R $SMB_USER:smbgrp /share/data
+    chmod -R ug+rwx,o+rx-w /share/data
+
+    mkdir /share/external
+    chown -R $SMB_USER:smbgrp /share/external
+    chmod -R ug+rwx,o+rx-w /share/external
 
 fi
 
