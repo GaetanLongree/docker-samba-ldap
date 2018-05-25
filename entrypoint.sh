@@ -37,7 +37,7 @@ usershare allow guests = yes
 
 [data]
 path = /share/data
-valid users = arteus
+valid users = $SMB_USER
 browsable = yes
 writable = yes
 create mode = 0777
@@ -45,9 +45,9 @@ directory mode = 0777
 
 [external]
 path = /share/external
+valid users = $SMB_EXT_USER
 browsable = yes
 writable = yes
-guest ok = yes
 create mode = 0777
 directory mode = 0777
 EOF
@@ -57,18 +57,22 @@ fi
 # create a user for the samba share
 groupadd smbgrp
 useradd $SMB_USER -G smbgrp
+useradd $SMB_EXT_USER -G smbgrp
 echo "$SMB_USER:$SMB_USER_PASSWD" | chpasswd
+echo "$SMB_EXT_USER:$SMB_EXT_USER_PASSWD" | chpasswd
 
 # reproduce the user and password for samba
 echo -ne "$SMB_USER_PASSWD\n$SMB_USER_PASSWD\n" | smbpasswd -a -s $SMB_USER
+echo -ne "$SMB_EXT_USER_PASSWD\n$SMB_EXT_USER_PASSWD\n" | smbpasswd -a -s $SMB_EXT_USER
 smbpasswd -e $SMB_USER
+smbpasswd -e $SMB_EXT_USER
 
 mkdir /share/data
 chown -R $SMB_USER:smbgrp /share/data
 chmod -R 2770 /share/data
 
 mkdir /share/external
-chown -R $SMB_USER:smbgrp /share/external
+chown -R $SMB_EXT_USER:smbgrp /share/external
 chmod -R 2775 /share/external
 
 else

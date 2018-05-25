@@ -19,6 +19,9 @@ ENV LDAP_BASE_DN ou=Users,dc=contoso,dc=com
 ENV SMB_USER shareuser
 ENV SMB_USER_PASSWD password
 
+ENV SMB_EXT_USER extuser
+ENV SMB_EXT_USER_PASSWD extpassword
+
 RUN apt-get update && \
 	apt-get install --no-install-recommends --no-install-suggests -y \
 	samba libnss-ldap smbldap-tools ldap-utils wget perl make &&\
