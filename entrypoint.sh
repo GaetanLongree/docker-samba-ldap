@@ -115,7 +115,7 @@ else
     # create a user for the samba share
     groupadd smbgrp
     useradd $SMB_USER -G smbgrp
-    echo $SMB_USER_PASSWD | passwd --stdin $SMB_USER
+    echo "$SMB_USER:$SMB_USER_PASSWD" | chpasswd
 
     # reproduce the user and password for samba
     echo -ne "$SMB_USER_PASSWD\n$SMB_USER_PASSWD\n" | smbpasswd -a -s $SMB_USER
