@@ -24,6 +24,8 @@ docker run -d \
 -v /mnt/share/samba/share:/share \
 --env SMB_USER=user \
 --env SMB_USER_PASSWD=password \
+--env SMB_EXT_USER=extuser \
+--env SMB_EXT_USER_PASSWD=extpassword \
 --name samba \
 cajetan19/samba-ldap
 ```
